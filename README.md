@@ -1,59 +1,118 @@
-# MongoDB Fundamentals - Week 1
+# MongoDB Script Execution Guide
 
-## Setup Instructions
+This README explains how to run the MongoDB scripts provided in this project. The commands cover CRUD operations, advanced querying, aggregation pipelines, and index usage.
 
-Before you begin this assignment, please make sure you have the following installed:
+---
 
-1. **MongoDB Community Edition** - [Installation Guide](https://www.mongodb.com/docs/manual/administration/install-community/)
-2. **MongoDB Shell (mongosh)** - This is included with MongoDB Community Edition
-3. **Node.js** - [Download here](https://nodejs.org/)
+## ✅ Requirements
 
-### Node.js Package Setup
+Before running the scripts, ensure:
 
-Once you have Node.js installed, run the following commands in your assignment directory:
+- You have **MongoDB installed** on your system.
+- You can access the shell using:
 
 ```bash
-# Initialize a package.json file
-npm init -y
+mongosh
+````
 
-# Install the MongoDB Node.js driver
-npm install mongodb
+* Your database contains a books collection. If not, insert some sample data:
+
+```js
+db.books.insertMany([
+  { title: "1984", author: "George Orwell", genre: "Dystopian", price: 8.99, published_year: 1949, in_stock: true },
+  { title: "The Great Gatsby", author: "F. Scott Fitzgerald", genre: "Classic", price: 10.99, published_year: 1925, in_stock: true },
+  { title: "To Kill a Mockingbird", author: "Harper Lee", genre: "Fiction", price: 12.99, published_year: 1960, in_stock: false }
+]);
 ```
 
-## Assignment Overview
+---
 
-This week focuses on MongoDB fundamentals including:
-- Creating and connecting to MongoDB databases
-- CRUD operations (Create, Read, Update, Delete)
-- MongoDB queries and filters
-- Aggregation pipelines
-- Indexing for performance
+## ▶️ How to Run the Scripts
 
-## Submission
+### 1️⃣ Open MongoDB Shell
 
-Complete all the exercises in this assignment and push your code to GitHub using the provided GitHub Classroom link.
+```bash
+mongosh
+```
 
-## Getting Started
+### 2️⃣ Select Your Database
 
-1. Accept the GitHub Classroom assignment invitation
-2. Clone your personal repository that was created by GitHub Classroom
-3. Install MongoDB locally or set up a MongoDB Atlas account
-4. Run the provided `insert_books.js` script to populate your database
-5. Complete the tasks in the assignment document
+```js
+use your_database_name;
+```
 
-## Files Included
+---
 
-- `Week1-Assignment.md`: Detailed assignment instructions
-- `insert_books.js`: Script to populate your MongoDB database with sample book data
+## 📌 Running Each Task
 
-## Requirements
+### 🟩 Task 2: CRUD Operations
 
-- Node.js (v18 or higher)
-- MongoDB (local installation or Atlas account)
-- MongoDB Shell (mongosh) or MongoDB Compass
+Copy and paste each command **one by one** into `mongosh`.
 
-## Resources
+Example:
 
-- [MongoDB Documentation](https://docs.mongodb.com/)
-- [MongoDB University](https://university.mongodb.com/)
-- [MongoDB Node.js Driver](https://mongodb.github.io/node-mongodb-native/) 
+```js
+db.books.find({ genre: "Fiction" }, { title: true, author: true, price: true });
+db.books.updateOne({ title: "1984" }, { $set: { price: 9.0 } });
+```
+
+---
+
+### 🟦 Task 3: Advanced Queries
+
+Simply paste each query.
+
+💡 For pagination, paste the entire loop at once:
+
+```js
+for (let page = 1; page <= 3; page++) {
+  const skip = (page - 1) * 5;
+  print(`\n--- Page ${page} ---\n`);
+  db.books.find({}, { title: true, author: true, price: true })
+    .skip(skip)
+    .limit(5)
+    .forEach(doc => printjson(doc));
+}
+```
+
+---
+
+### 🟨 Task 4: Aggregation Pipelines
+
+Example:
+
+```js
+db.books.aggregate([
+  { $group: { _id: "$genre", averagePrice: { $avg: "$price" } } }
+]);
+```
+
+---
+
+### 🟥 Task 5: Indexing & Performance Testing
+
+```js
+db.books.createIndex({ title: 1 });
+db.books.find({ title: "The Great Gatsby" }).explain("executionStats");
+```
+
+Compare the `executionStats` *before and after* creating indexes to observe performance changes.
+
+---
+
+## ✅ Tips
+
+| Task                                                | How to Execute                              |
+| --------------------------------------------------- | ------------------------------------------- |
+| Single-line query                                   | Paste into mongosh                          |
+| Multi-line script (like `for` loops or `aggregate`) | Paste entire block                          |
+| Undo/Retry                                          | Use `db.books.deleteMany({})` to clear data |
+
+---
+
+## 🎯 Conclusion
+
+You can run all commands **directly inside the MongoDB shell**. There is no need for separate `.js` files unless you want to automate the process — in that case, you can wrap commands in a `.js` file and run:
+
+```bash
+mongosh queries.js
